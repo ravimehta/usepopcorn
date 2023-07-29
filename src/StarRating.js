@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const containerStyle = {
   display: "flex",
@@ -10,6 +11,16 @@ const starContainerStyle = {
   display: "flex",
 };
 
+StarRating.propTypes = {
+  maxRating: PropTypes.number,
+  color: PropTypes.string,
+  size: PropTypes.number,
+  className: PropTypes.string,
+  labels: PropTypes.array,
+  defaultRating: PropTypes.number,
+  onSetRating: PropTypes.func,
+};
+
 export default function StarRating({
   maxRating = 5,
   color = "#fcc419",
@@ -17,6 +28,7 @@ export default function StarRating({
   className = "",
   labels = [],
   defaultRating = 0,
+  onSetRating,
 }) {
   const textStyle = {
     lineHeight: "1",
@@ -26,10 +38,11 @@ export default function StarRating({
   };
 
   const [rating, setRating] = useState(defaultRating);
-  const [tempRating, setTempRating] = useState(defaultRating);
+  const [tempRating, setTempRating] = useState(0);
 
   function handleRating(newRating) {
     setRating(newRating);
+    onSetRating(newRating);
   }
 
   return (
@@ -37,7 +50,8 @@ export default function StarRating({
       <div style={starContainerStyle}>
         {Array.from({ length: maxRating }, (_, i) => {
           return (
-            <span>
+            // NOTE: Key needs to be on top level React fragment
+            <span key={i}>
               <Star
                 key={i}
                 full={tempRating ? i <= tempRating - 1 : i <= rating - 1}
