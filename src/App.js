@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import StarRating from "./StarRating";
 import { useMovies } from "./useMovies";
 import { useLocalStorageState } from "./useLocalStorageStage";
+import { useKey } from "./useKey";
 
 const OMDB_KEY = "77438cc0";
 
@@ -49,23 +50,12 @@ function SearchBar({ query, setQuery }) {
     setQuery(e.target.value);
   };
 
-  useEffect(() => {
-    const handleEnterKey = (e) => {
-      if (document.activeElement !== inputEl.current) {
-        if (e.code === "Enter") {
-          inputEl.current.focus();
-          setQuery("");
-        }
-      }
-    };
-
-    document.addEventListener("keydown", handleEnterKey);
-
-    // inputEl.current.focus();
-    return () => {
-      document.removeEventListener("keydown", handleEnterKey);
-    };
-  }, [setQuery]);
+  useKey("Enter", () => {
+    if (document.activeElement !== inputEl.current) {
+      inputEl.current.focus();
+      setQuery("");
+    }
+  });
 
   return (
     <input
@@ -127,6 +117,7 @@ function MovieList({ movies, onSelectMovie }) {
 
 function MovieDetails({ selectedId, onClose, onAddWatched, watched }) {
   const [isLoading, setIsLoading] = useState(false);
+  // eslint-disable-next-line
   const [error, setError] = useState("");
   const [movieDetails, setMovieDetails] = useState({});
   const [userRating, setUserRating] = useState(0);
@@ -167,19 +158,7 @@ function MovieDetails({ selectedId, onClose, onAddWatched, watched }) {
     onClose();
   }
 
-  useEffect(() => {
-    const handleEscapeKey = (e) => {
-      if (e.code === "Escape") {
-        onClose();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscapeKey);
-
-    return () => {
-      document.removeEventListener("keydown", handleEscapeKey);
-    };
-  }, [onClose]);
+  useKey("Escape", onClose);
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
